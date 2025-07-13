@@ -3,7 +3,7 @@ import sys
 import os
 
 
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
 from src.main import Product, Category
@@ -35,7 +35,9 @@ def test_category_initialization():
     product2 = Product("Тест2", "О2", 20.0, 2)
     products_list = [product1, product2]
 
-    category = Category("Тестовая Категория", "Описание тестовой категории", products_list)
+    category = Category(
+        "Тестовая Категория", "Описание тестовой категории", products_list
+    )
 
     assert category.name == "Тестовая Категория"
     assert category.description == "Описание тестовой категории"
@@ -98,9 +100,13 @@ def test_add_product_method():
 def test_add_product_type_error():
     """Проверяем, что add_product отклоняет не-Product объекты."""
     category = Category("ТестКат", "Описание", [])
-    with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product."):
+    with pytest.raises(
+        TypeError, match="Можно добавлять только объекты класса Product."
+    ):
         category.add_product("Не продукт")
-    with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product."):
+    with pytest.raises(
+        TypeError, match="Можно добавлять только объекты класса Product."
+    ):
         category.add_product(123)
 
 
@@ -129,7 +135,7 @@ def test_product_price_setter_zero_or_negative():
 def test_product_price_setter_lower_price_confirm(monkeypatch):
     """Проверяем понижение цены с подтверждением 'y'."""
     product = Product("Тест", "О", 100.0, 5)
-    monkeypatch.setattr('builtins.input', lambda _: 'y')
+    monkeypatch.setattr("builtins.input", lambda _: "y")
     product.price = 50.0
     assert product.price == 50.0
 
@@ -137,7 +143,7 @@ def test_product_price_setter_lower_price_confirm(monkeypatch):
 def test_product_price_setter_lower_price_cancel(monkeypatch):
     """Проверяем понижение цены с отменой 'n'."""
     product = Product("Тест", "О", 100.0, 5)
-    monkeypatch.setattr('builtins.input', lambda _: 'n')
+    monkeypatch.setattr("builtins.input", lambda _: "n")
     product.price = 50.0
     assert product.price == 100.0
 
@@ -145,8 +151,8 @@ def test_product_price_setter_lower_price_cancel(monkeypatch):
 def test_product_price_setter_lower_price_invalid_input(monkeypatch):
     """Проверяем понижение цены с неверным вводом, затем 'y'."""
     product = Product("Тест", "О", 100.0, 5)
-    inputs = iter(['x', 'y'])
-    monkeypatch.setattr('builtins.input', lambda _: next(inputs))
+    inputs = iter(["x", "y"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
     product.price = 50.0
     assert product.price == 50.0
 
@@ -154,7 +160,12 @@ def test_product_price_setter_lower_price_invalid_input(monkeypatch):
 def test_new_product_creates_new():
     """Проверяем, что new_product создает новый объект, если нет дубликатов."""
     products = []
-    product_data = {"name": "Новый Товар", "description": "Описание", "price": 100.0, "quantity": 10}
+    product_data = {
+        "name": "Новый Товар",
+        "description": "Описание",
+        "price": 100.0,
+        "quantity": 10,
+    }
     new_prod = Product.new_product(product_data, products_list=products)
 
     assert isinstance(new_prod, Product)
@@ -168,15 +179,29 @@ def test_new_product_handles_duplicates():
     existing_product = Product("Existing Product", "Old Desc", 50.0, 5)
     products = [existing_product]
 
-    product_data_higher_price = {"name": "Existing Product", "description": "New Desc", "price": 70.0, "quantity": 3}
-    updated_prod = Product.new_product(product_data_higher_price, products_list=products)
+    product_data_higher_price = {
+        "name": "Existing Product",
+        "description": "New Desc",
+        "price": 70.0,
+        "quantity": 3,
+    }
+    updated_prod = Product.new_product(
+        product_data_higher_price, products_list=products
+    )
 
     assert updated_prod is existing_product
     assert updated_prod.quantity == 8
     assert updated_prod.price == 70.0
 
-    product_data_lower_price = {"name": "Existing Product", "description": "New Desc", "price": 40.0, "quantity": 2}
-    updated_prod_again = Product.new_product(product_data_lower_price, products_list=products)
+    product_data_lower_price = {
+        "name": "Existing Product",
+        "description": "New Desc",
+        "price": 40.0,
+        "quantity": 2,
+    }
+    updated_prod_again = Product.new_product(
+        product_data_lower_price, products_list=products
+    )
 
     assert updated_prod_again is existing_product
     assert updated_prod_again.quantity == 10
@@ -215,7 +240,9 @@ def test_category_str_representation():
 
 def test_product_add_method():
     """Проверяет магический метод сложения __add__ для Product."""
-    product_a = Product("Товар А", "Описание А", 100.0, 10) # Стоимость: 100 * 10 = 1000
+    product_a = Product(
+        "Товар А", "Описание А", 100.0, 10
+    )
     product_b = Product("Товар Б", "Описание Б", 200.0, 2)  # Стоимость: 200 * 2 = 400
     product_c = Product("Товар В", "Описание В", 50.0, 20)  # Стоимость: 50 * 20 = 1000
 
