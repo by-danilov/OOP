@@ -1,9 +1,97 @@
+import sys
+import warnings
+
 class Product:
     def __init__(self, name, description, price, quantity):
         self.name = name
         self.description = description
-        self.price = price
+        self.__price = price
         self.quantity = quantity
+
+    def __str__(self):
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other):
+        if type(self) is not type(other):
+            raise TypeError("Можно складывать товары только из одинаковых классов продуктов.")
+        if isinstance(other, Product):
+            return (self.price * self.quantity) + \
+                   (other.price * other.quantity)
+        else:
+            raise TypeError("Можно складывать только объекты Product "
+                            "и их наследников между собой.")
+
+    @property
+    def price(self):
+        return self.__price
+
+    @price.setter
+    def price(self, new_price):
+        if not isinstance(new_price, (int, float)):
+            warnings.warn("Цена должна быть числом.", UserWarning)
+            return
+
+        if new_price <= 0:
+            warnings.warn("Цена не должна быть нулевая или отрицательная.", UserWarning)
+            return
+
+        if new_price < self.__price:
+            while True:
+                confirmation = input(
+                    f"Цена товара '{self.name}' понижается с {self.__price} до "
+                    f"{new_price}. Подтвердите (y/n): ").lower()
+                if confirmation == 'y':
+                    self.__price = new_price
+                    print(f"Цена товара '{self.name}' успешно понижена до "
+                          f"{self.__price}.")
+                    break
+                elif confirmation == 'n':
+                    print(f"Понижение цены для '{self.name}' отменено. "
+                          f"Текущая цена: {self.__price}.")
+                    break
+                else:
+                    print("Некорректный ввод. Пожалуйста, введите 'y' или 'n'.")
+        else:
+            self.__price = new_price
+
+    @classmethod
+    def new_product(cls, product_data, products_list=None):
+        name = product_data.get("name")
+        description = product_data.get("description")
+        price = product_data.get("price")
+        quantity = product_data.get("quantity")
+
+        if not all([name, description, price, quantity is not None]):
+            raise ValueError("Недостаточно данных для создания продукта.")
+
+        if products_list:
+            for existing_product in products_list:
+                if existing_product.name == name:
+                    print(f"Найден дубликат товара: '{name}'. "
+                          f"Обновляем существующий товар.")
+                    existing_product.quantity += quantity
+                    if price > existing_product.price:
+                        existing_product.price = price
+                    return existing_product
+
+        return cls(name, description, price, quantity)
+
+
+class Smartphone(Product):
+    def __init__(self, name, description, price, quantity, efficiency, model, memory, color):
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+
+class LawnGrass(Product):
+    def __init__(self, name, description, price, quantity, country, germination_period, color):
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
 
 
 class Category:
@@ -13,50 +101,105 @@ class Category:
     def __init__(self, name, description, products):
         self.name = name
         self.description = description
-        self.products = products
+        self.__products = []
+        for product in products:
+            self.add_product(product)
+
         Category.category_count += 1
-        Category.product_count += len(products)
+
+    def __str__(self):
+        total_quantity_in_category = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов: {total_quantity_in_category} шт."
+
+    def add_product(self, product):
+        if not isinstance(product, Product):
+            raise TypeError("Можно добавлять только объекты классов Product или его наследников.")
+        self.__products.append(product)
+        Category.product_count += 1
+
+    @property
+    def products(self):
+        product_info = []
+        for product in self.__products:
+            product_info.append(str(product))
+        return product_info
 
 
-if __name__ == "__main__":
-    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-    product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+if __name__ == '__main__':
+    Category.category_count = 0
+    Category.product_count = 0
 
-    print(product1.name)
-    print(product1.description)
-    print(product1.price)
-    print(product1.quantity)
+    print("--- Создание и вывод информации о Смартфонах ---")
+    smartphone1 = Smartphone("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5, 95.5,
+                             "S23 Ultra", 256, "Серый")
+    smartphone2 = Smartphone("Iphone 15", "512GB, Gray space", 210000.0, 8, 98.2, "15", 512, "Gray space")
+    smartphone3 = Smartphone("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14, 90.3, "Note 11", 1024, "Синий")
 
-    print(product2.name)
-    print(product2.description)
-    print(product2.price)
-    print(product2.quantity)
+    print(f"Смартфон 1: {smartphone1.name}, {smartphone1.description}, {smartphone1.price}, "
+          f"{smartphone1.quantity}, {smartphone1.efficiency}, {smartphone1.model}, "
+          f"{smartphone1.memory}, {smartphone1.color}")
+    print(f"Смартфон 2: {smartphone2.name}, {smartphone2.description}, {smartphone2.price}, "
+          f"{smartphone2.quantity}, {smartphone2.efficiency}, {smartphone2.model}, "
+          f"{smartphone2.memory}, {smartphone2.color}")
+    print(f"Смартфон 3: {smartphone3.name}, {smartphone3.description}, {smartphone3.price}, "
+          f"{smartphone3.quantity}, {smartphone3.efficiency}, {smartphone3.model}, "
+          f"{smartphone3.memory}, {smartphone3.color}")
 
-    print(product3.name)
-    print(product3.description)
-    print(product3.price)
-    print(product3.quantity)
+    print("\n--- Создание и вывод информации о Газонной траве ---")
+    grass1 = LawnGrass("Газонная трава", "Элитная трава для газона", 500.0, 20, "Россия", "7 дней", "Зеленый")
+    grass2 = LawnGrass("Газонная трава 2", "Выносливая трава", 450.0, 15, "США", "5 дней", "Темно-зеленый")
 
-    category1 = Category("Смартфоны",
-                         "Смартфоны, как средство не только коммуникации,но и получения дополнительных функций для удобства жизни",
-                         [product1, product2, product3])
+    print(f"Трава 1: {grass1.name}, {grass1.description}, {grass1.price}, {grass1.quantity}, "
+          f"{grass1.country}, {grass1.germination_period}, {grass1.color}")
+    print(f"Трава 2: {grass2.name}, {grass2.description}, {grass2.price}, {grass2.quantity}, "
+          f"{grass2.country}, {grass2.germination_period}, {grass2.color}")
 
-    print(category1.name == "Смартфоны")
-    print(category1.description)
-    print(len(category1.products))
-    print(category1.category_count)
-    print(category1.product_count)
 
-    product4 = Product("55\" QLED 4K", "Фоновая подсветка", 123000.0, 7)
-    category2 = Category("Телевизоры",
-                         "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
-                         [product4])
+    print("\n--- Проверка сложения однотипных продуктов ---")
+    smartphone_sum = smartphone1 + smartphone2
+    print(f"smartphone1 + smartphone2: {smartphone_sum}")
 
-    print(category2.name)
-    print(category2.description)
-    print(len(category2.products))
-    print(category2.products)
+    grass_sum = grass1 + grass2
+    print(f"grass1 + grass2: {grass_sum}")
 
-    print(Category.category_count)
-    print(Category.product_count)
+    print("\n--- Проверка сложения разнотипных продуктов (ожидается TypeError) ---")
+    try:
+        invalid_sum = smartphone1 + grass1
+    except TypeError as e:
+        print(f"Возникла ожидаемая ошибка TypeError при попытке сложения: {e}")
+    else:
+        print("Не возникла ошибка TypeError при попытке сложения (ОШИБКА)")
+
+
+    print("\n--- Проверка инициализации категорий с наследниками ---")
+    category_smartphones = Category("Смартфоны", "Высокотехнологичные смартфоны", [smartphone1, smartphone2])
+    print(f"Категория Смартфоны: {category_smartphones}")
+    print(category_smartphones.products)
+
+    category_grass = Category("Газонная трава", "Различные виды газонной травы", [grass1, grass2])
+    print(f"Категория Газонная трава: {category_grass}")
+    print(category_grass.products)
+
+
+    print("\n--- Проверка добавления продуктов в категорию (add_product) ---")
+    category_smartphones.add_product(smartphone3)
+    print(f"Категория Смартфоны после добавления smartphone3: {category_smartphones}")
+    print(category_smartphones.products)
+
+    print(f"Общее количество продуктов во всех категориях (Category.product_count): "
+          f"{Category.product_count}")
+
+    print("\n--- Проверка добавления не-продукта в категорию (ожидается TypeError) ---")
+    try:
+        category_smartphones.add_product("Not a product")
+    except TypeError as e:
+        print(f"Возникла ожидаемая ошибка TypeError при добавлении не продукта: {e}")
+    else:
+        print("Не возникла ошибка TypeError при добавлении не продукта (ОШИБКА)")
+
+    try:
+        category_smartphones.add_product(123)
+    except TypeError as e:
+        print(f"Возникла ожидаемая ошибка TypeError при добавлении числа: {e}")
+    else:
+        print("Не возникла ошибка TypeError при добавлении числа (ОШИБКА)")
