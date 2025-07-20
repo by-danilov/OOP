@@ -1,15 +1,15 @@
 import pytest
 import sys
 import os
-import warnings # Добавлено
+import warnings
 
-# Определяем путь к корневой директории проекта (OOP)
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
 from src.main import Product, Category, Smartphone, LawnGrass
 
-# Фикстура Pytest для сброса счетчиков перед каждым тестом
+
 @pytest.fixture(autouse=True)
 def reset_category_counts():
     """
@@ -19,7 +19,6 @@ def reset_category_counts():
     Category.category_count = 0
     Category.product_count = 0
 
-# --- Старые тесты (проверяем, что они продолжают работать) ---
 
 def test_product_initialization():
     """Проверяем корректность инициализации объекта Product."""
@@ -36,7 +35,9 @@ def test_category_initialization():
     product2 = Product("Тест2", "О2", 20.0, 2)
     products_list = [product1, product2]
 
-    category = Category("Тестовая Категория", "Описание тестовой категории", products_list)
+    category = Category(
+        "Тестовая Категория", "Описание тестовой категории", products_list
+    )
 
     assert category.name == "Тестовая Категория"
     assert category.description == "Описание тестовой категории"
@@ -89,7 +90,6 @@ def test_add_product_method():
     assert category.products[1] == "Товар2, 20.0 руб. Остаток: 2 шт."
     assert Category.product_count == initial_product_count + 2
 
-# --- Измененные тесты (проверка на регрессию и новую логику) ---
 
 def test_add_product_type_error_category():
     """
@@ -116,6 +116,7 @@ def test_product_price_setter_valid():
     product = Product("Тест", "О", 100.0, 5)
     product.price = 150.0
     assert product.price == 150.0
+
 
 def test_product_price_setter_zero_or_negative():
     """
@@ -170,24 +171,32 @@ def test_new_product_creates_new():
     assert new_prod.price == 100.0
     assert new_prod.quantity == 10
 
+
+
 def test_new_product_handles_duplicates():
     """Проверяем, что new_product обрабатывает дубликаты."""
     existing_product = Product("Existing Product", "Old Desc", 50.0, 5)
     products = [existing_product]
 
+
     product_data_higher_price = {"name": "Existing Product", "description": "New Desc", "price": 70.0, "quantity": 3}
     updated_prod = Product.new_product(product_data_higher_price, products_list=products)
+
 
     assert updated_prod is existing_product
     assert updated_prod.quantity == 8
     assert updated_prod.price == 70.0
 
+
     product_data_lower_price = {"name": "Existing Product", "description": "New Desc", "price": 40.0, "quantity": 2}
     updated_prod_again = Product.new_product(product_data_lower_price, products_list=products)
+
 
     assert updated_prod_again is existing_product
     assert updated_prod_again.quantity == 10
     assert updated_prod_again.price == 70.0
+
+
 
 def test_new_product_missing_data_raises_error():
     """Проверяем, что new_product выбрасывает ошибку при неполных данных."""
@@ -195,12 +204,14 @@ def test_new_product_missing_data_raises_error():
     with pytest.raises(ValueError, match="Недостаточно данных для создания продукта."):
         Product.new_product(product_data)
 
+
 def test_product_str_representation():
     """Проверяет строковое представление объекта Product."""
     product = Product("Телевизор", "Большой экран", 50000.0, 3)
     expected_str = "Телевизор, 50000.0 руб. Остаток: 3 шт."
     assert str(product) == expected_str
 
+    
 def test_category_str_representation():
     """Проверяет строковое представление объекта Category."""
     product1 = Product("Мышь", "Компьютерная", 500.0, 10)
@@ -216,7 +227,6 @@ def test_category_str_representation():
     expected_str_after_add = "Аксессуары, количество продуктов: 17 шт."
     assert str(category) == expected_str_after_add
 
-# --- Новые тесты для Заданий 1, 2 и 3 ---
 
 def test_smartphone_initialization():
     """Проверяет корректность инициализации объекта Smartphone."""

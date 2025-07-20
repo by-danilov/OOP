@@ -76,7 +76,6 @@ class Product:
 
         return cls(name, description, price, quantity)
 
-
 class Smartphone(Product):
     def __init__(self, name, description, price, quantity, efficiency, model, memory, color):
         super().__init__(name, description, price, quantity)
@@ -92,7 +91,6 @@ class LawnGrass(Product):
         self.country = country
         self.germination_period = germination_period
         self.color = color
-
 
 class Category:
     category_count = 0
