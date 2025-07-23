@@ -40,6 +40,7 @@ class Product(CreationLoggerMixin, BaseProduct):
     def __init__(self, name, description, price, quantity):
         super().__init__(name, description, price, quantity)
 
+
     def __str__(self):
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
@@ -56,6 +57,7 @@ class Product(CreationLoggerMixin, BaseProduct):
     @property
     def price(self):
         return self._price
+
 
     @price.setter
     def price(self, new_price):
@@ -80,11 +82,13 @@ class Product(CreationLoggerMixin, BaseProduct):
                 elif confirmation == 'n':
                     print(f"Понижение цены для '{self.name}' отменено. "
                           f"Текущая цена: {self._price}.")
+
                     break
                 else:
                     print("Некорректный ввод. Пожалуйста, введите 'y' или 'n'.")
         else:
             self._price = new_price
+
 
     @classmethod
     def new_product(cls, product_data, products_list=None):
@@ -126,6 +130,7 @@ class LawnGrass(Product):
         self.color = color
 
 
+
 class Category:
     category_count = 0
     product_count = 0
@@ -159,6 +164,7 @@ class Category:
 
 
 if __name__ == '__main__':
+
 
     Category.category_count = 0
     Category.product_count = 0
