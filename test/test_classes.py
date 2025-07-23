@@ -264,6 +264,7 @@ def test_product_add_method_different_types_raises_typeerror():
     with pytest.raises(TypeError, match="Можно складывать товары только из одинаковых классов продуктов."):
         _ = grass + product
 
+
 def test_category_add_product_accepts_subclasses():
     category = Category("ТестНаследники", "Тест добавления наследников", [])
     smartphone = Smartphone("ТестСмарт", "О", 1000.0, 1, 90, "ModelX", 128, "Black")

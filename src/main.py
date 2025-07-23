@@ -143,6 +143,7 @@ class Category:
         total_quantity_in_category = sum(product.quantity for product in self.__products)
         return f"{self.name}, количество продуктов: {total_quantity_in_category} шт."
 
+
     def add_product(self, product):
         if not isinstance(product, Product):
             raise TypeError("Можно добавлять только объекты классов Product или его наследников.")
