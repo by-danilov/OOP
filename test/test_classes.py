@@ -2,20 +2,18 @@ import pytest
 import sys
 import os
 
-# Добавляем корневую директорию проекта в sys.path, чтобы импортировать src.main
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
 from src.main import Product, Category
 
-# Фикстура для сброса счетчиков Category перед каждым тестом
 @pytest.fixture(autouse=True)
 def reset_category_counts():
     """Сбрасывает счетчики класса Category перед каждым тестом."""
     Category.category_count = 0
     Category.product_count = 0
 
-# --- Тесты для Задания 1: Обработка нулевого количества в Product ---
+
 def test_product_init_zero_quantity_raises_value_error():
     """
     Проверяет, что Product.__init__ выбрасывает ValueError,
@@ -33,7 +31,7 @@ def test_product_init_positive_quantity_succeeds():
     assert product.quantity == 1
     assert product.name == "Хороший товар"
 
-# --- Тесты для Задания 2: Метод middle_price в Category ---
+
 def test_category_middle_price_with_products():
     """
     Проверяет корректность подсчета среднего ценника для категории с продуктами.
@@ -43,7 +41,7 @@ def test_category_middle_price_with_products():
     product3 = Product("Тест Продукт 3", "Три", 300.0, 2)
     category = Category("Тестовая категория", "Для проверки middle_price", [product1, product2, product3])
 
-    # Средняя цена: (100 + 200 + 300) / 3 = 600 / 3 = 200.0
+
     assert category.middle_price() == 200.0
 
 def test_category_middle_price_empty_category():
@@ -61,7 +59,7 @@ def test_category_middle_price_single_product():
     category = Category("Категория с одним", "Один продукт", [product])
     assert category.middle_price() == 500.0
 
-# --- Существующие тесты (базовая функциональность) ---
+
 def test_product_initialization():
     product = Product("Тестовый Продукт", "Описание тестового продукта", 100.0, 10)
     assert product.name == "Тестовый Продукт"
@@ -76,7 +74,7 @@ def test_category_initialization():
     category = Category("Тестовая Категория", "Описание тестовой категории", products_list)
     assert category.name == "Тестовая Категория"
     assert category.description == "Описание тестовой категории"
-    assert len(category.products) == 2 # Проверяем количество продуктов через свойство
+    assert len(category.products) == 2
     assert category.products[0] == "Тест1, 10.0 руб. Остаток: 1 шт."
     assert category.products[1] == "Тест2, 20.0 руб. Остаток: 2 шт."
 
@@ -93,7 +91,7 @@ def test_product_count_increment():
     assert Category.product_count == 2
     prod3 = Product("П3", "О3", 3, 3)
     category2 = Category("Кат2", "Опис2", [prod3])
-    assert Category.product_count == 3 # Должен увеличиваться глобальный счетчик
+    assert Category.product_count == 3
 
 def test_add_product_method_type_error():
     category = Category("ТестКат", "Описание", [])
@@ -115,7 +113,6 @@ def test_category_str_representation():
 def test_product_add_method():
     product1 = Product("Стул", "Мягкий", 1000.0, 2)
     product2 = Product("Стол", "Деревянный", 2000.0, 1)
-    # 1000 * 2 + 2000 * 1 = 2000 + 2000 = 4000
     assert (product1 + product2) == 4000.0
 
 def test_product_add_method_type_error():

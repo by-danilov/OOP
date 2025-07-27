@@ -1,6 +1,5 @@
 class Product:
     def __init__(self, name, description, price, quantity):
-        # Задание 1: Обработка нулевого количества при инициализации Product
         if quantity == 0:
             raise ValueError("Товар с нулевым количеством не может быть добавлен.")
         self.name = name
@@ -9,14 +8,14 @@ class Product:
         self.quantity = quantity
 
     def __add__(self, other):
-        # Добавлен для работы теста test_product_add_method и для общей логики
+
         if not isinstance(other, Product):
             raise TypeError("Можно складывать только объекты Product.")
-        # Предполагается, что вы складываете стоимости * количество
+
         return (self.price * self.quantity) + (other.price * other.quantity)
 
     def __str__(self):
-        # Добавлен для работы теста test_product_str_representation и для общей логики
+
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
 
@@ -27,20 +26,18 @@ class Category:
     def __init__(self, name, description, products):
         self.name = name
         self.description = description
-        self.__products = [] # Используем приватный список для продуктов
-        # Передаем каждый продукт через add_product, чтобы правильно обновить Category.product_count
+        self.__products = []
+
         for product in products:
             self.add_product(product)
 
         Category.category_count += 1
 
     def __str__(self):
-        # Добавлен для работы теста test_category_str_representation и для общей логики
         total_quantity_in_category = sum(product.quantity for product in self.__products)
         return f"{self.name}, количество продуктов: {total_quantity_in_category} шт."
 
     def add_product(self, product):
-        # Добавлен для правильного обновления Category.product_count и проверки типов
         if not isinstance(product, Product):
             raise TypeError("Можно добавлять только объекты классов Product или его наследников.")
         self.__products.append(product)
@@ -48,32 +45,29 @@ class Category:
 
     @property
     def products(self):
-        # Добавлен для работы теста test_category_initialization и для общей логики
         product_info = []
         for product in self.__products:
-            product_info.append(str(product)) # Используем str(product)
+            product_info.append(str(product))
         return product_info
 
 
-    # Задание 2: Новый метод middle_price
     def middle_price(self):
         total_price = sum(product.price for product in self.__products)
         try:
-            # Если нет продуктов, len(self.__products) будет 0, что вызовет ZeroDivisionError
             return total_price / len(self.__products)
         except ZeroDivisionError:
             return 0
 
 
 if __name__ == '__main__':
-    # Демонстрационный блок, предоставленный в задании
+
     print("--- Проверка Задания 1: Создание продукта с нулевым количеством ---")
     try:
         product_invalid = Product("Бракованный товар", "Неверное количество", 1000.0, 0)
     except ValueError as e:
         print(
             "Возникла ошибка ValueError прерывающая работу программы при попытке добавить продукт с нулевым количеством")
-        print(f"Сообщение об ошибке: {e}") # Выводим сообщение из исключения
+        print(f"Сообщение об ошибке: {e}")
     else:
         print("Не возникла ошибка ValueError при попытке добавить продукт с нулевым количеством")
 
@@ -100,3 +94,4 @@ if __name__ == '__main__':
 
     # Пример сложения
     print(f"Стоимость product1 + product2 (quantity * price): {product1 + product2}")
+    
