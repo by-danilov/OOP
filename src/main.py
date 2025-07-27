@@ -1,12 +1,45 @@
 import sys
 import warnings
+from abc import ABC, abstractmethod
 
-class Product:
+
+class CreationLoggerMixin:
+    def __init__(self, *args, **kwargs):
+        print(f"Создан объект класса: {self.__class__.__name__}")
+        print(f"Параметры: args={args}, kwargs={kwargs}")
+        super().__init__(*args, **kwargs)
+
+
+class BaseProduct(ABC):
     def __init__(self, name, description, price, quantity):
         self.name = name
         self.description = description
-        self.__price = price
+        self._price = price
         self.quantity = quantity
+
+    @property
+    @abstractmethod
+    def price(self):
+        pass
+
+    @price.setter
+    @abstractmethod
+    def price(self, new_price):
+        pass
+
+    @abstractmethod
+    def __str__(self):
+        pass
+
+    @abstractmethod
+    def __add__(self, other):
+        pass
+
+
+class Product(CreationLoggerMixin, BaseProduct):
+    def __init__(self, name, description, price, quantity):
+        super().__init__(name, description, price, quantity)
+
 
     def __str__(self):
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
@@ -23,7 +56,8 @@ class Product:
 
     @property
     def price(self):
-        return self.__price
+        return self._price
+
 
     @price.setter
     def price(self, new_price):
@@ -35,24 +69,26 @@ class Product:
             warnings.warn("Цена не должна быть нулевая или отрицательная.", UserWarning)
             return
 
-        if new_price < self.__price:
+        if new_price < self._price:
             while True:
                 confirmation = input(
-                    f"Цена товара '{self.name}' понижается с {self.__price} до "
+                    f"Цена товара '{self.name}' понижается с {self._price} до "
                     f"{new_price}. Подтвердите (y/n): ").lower()
                 if confirmation == 'y':
-                    self.__price = new_price
+                    self._price = new_price
                     print(f"Цена товара '{self.name}' успешно понижена до "
-                          f"{self.__price}.")
+                          f"{self._price}.")
                     break
                 elif confirmation == 'n':
                     print(f"Понижение цены для '{self.name}' отменено. "
-                          f"Текущая цена: {self.__price}.")
+                          f"Текущая цена: {self._price}.")
+
                     break
                 else:
                     print("Некорректный ввод. Пожалуйста, введите 'y' или 'n'.")
         else:
-            self.__price = new_price
+            self._price = new_price
+
 
     @classmethod
     def new_product(cls, product_data, products_list=None):
@@ -76,6 +112,7 @@ class Product:
 
         return cls(name, description, price, quantity)
 
+
 class Smartphone(Product):
     def __init__(self, name, description, price, quantity, efficiency, model, memory, color):
         super().__init__(name, description, price, quantity)
@@ -91,6 +128,8 @@ class LawnGrass(Product):
         self.country = country
         self.germination_period = germination_period
         self.color = color
+
+
 
 class Category:
     category_count = 0
@@ -109,6 +148,7 @@ class Category:
         total_quantity_in_category = sum(product.quantity for product in self.__products)
         return f"{self.name}, количество продуктов: {total_quantity_in_category} шт."
 
+
     def add_product(self, product):
         if not isinstance(product, Product):
             raise TypeError("Можно добавлять только объекты классов Product или его наследников.")
@@ -124,6 +164,8 @@ class Category:
 
 
 if __name__ == '__main__':
+
+
     Category.category_count = 0
     Category.product_count = 0
 
@@ -201,3 +243,10 @@ if __name__ == '__main__':
         print(f"Возникла ожидаемая ошибка TypeError при добавлении числа: {e}")
     else:
         print("Не возникла ошибка TypeError при добавлении числа (ОШИБКА)")
+
+    print("\n--- Проверка BaseProduct (попытка создания экземпляра, ожидается TypeError) ---")
+    try:
+        base_prod_test = BaseProduct("Базовый", "Описание", 10.0, 1)
+        print("ОШИБКА: удалось создать экземпляр BaseProduct.")
+    except TypeError as e:
+        print(f"УСПЕХ: Не удалось создать экземпляр BaseProduct. Ошибка: {e}")
