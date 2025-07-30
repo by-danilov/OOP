@@ -4,10 +4,10 @@ import os
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 sys.path.insert(0, project_root)
 
-# Импортируем классы из src.main
+
 from src.main import Product, Category
 
-# Весь ваш демонстрационный код
+
 print("--- Проверка Задания 1: Создание продукта с нулевым количеством ---")
 try:
     product_invalid = Product("Бракованный товар", "Неверное количество", 1000.0, 0)
