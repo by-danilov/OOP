@@ -7,7 +7,6 @@ sys.path.insert(0, project_root)
 
 from src.main import Product, Category
 
-
 print("--- Проверка Задания 1: Создание продукта с нулевым количеством ---")
 try:
     product_invalid = Product("Бракованный товар", "Неверное количество", 1000.0, 0)
